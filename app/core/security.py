@@ -22,7 +22,7 @@ async def create_session(user_id: str, user_email: str, response: Response):
 
 
     await redis_client.set(
-            f"session : {session_id}",
+            f"session:{session_id}",
             json.dumps(user),
             ex=3600,
         )
