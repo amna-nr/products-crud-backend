@@ -2,6 +2,7 @@ import bcrypt
 import secrets
 import json
 from app.core.redis import redis_client
+from app.core.config import settings 
 from fastapi import Response
 
 
@@ -31,7 +32,7 @@ async def create_session(user_id: str, user_email: str, response: Response):
             key="session_id",
             value=session_id,
             httponly=True,
-            secure=True,
+            secure=settings.ENVIRONMENT == "production",
             samesite="lax",
             max_age=3600,
         )
