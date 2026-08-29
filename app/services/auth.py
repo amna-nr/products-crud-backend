@@ -2,9 +2,10 @@ from app.schemas.auth import UserRegister, UserLogin
 from app.core.database import db_dependency
 from app.core.security import hash_password, check_password, create_session
 from app.models.user import User
+from app.core.redis import redis_client
 
 from sqlalchemy import select
-from fastapi import HTTPException, Response 
+from fastapi import HTTPException, Response, Cookie
 from starlette import status
 
 
@@ -55,4 +56,20 @@ async def login(credentials: UserLogin, db: db_dependency, response: Response):
     return {"message": "logged in"}
     
 
-    
+async def logout(response: Response, session_id: str = Cookie(...)):
+    session = await redis_client.get(f"session:{session_id}")
+
+    if not session:
+        raise HTTPException(
+             status_code=401, 
+             detail="Session not found"
+        )
+
+    await redis_client.delete(f"session:{session_id}")
+
+    response.delete_cookie("session_id")
+
+    return {"message": "User has been logged out"}
+
+
+     
