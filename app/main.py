@@ -7,6 +7,7 @@ app = FastAPI()
 
 app.include_router(auth_router)
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:5173"],
