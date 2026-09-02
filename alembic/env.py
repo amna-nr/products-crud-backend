@@ -7,6 +7,7 @@ from alembic import context
 
 from app.core.database import Base
 from app.models.user import User
+from app.models.product import Product
 from app.core.config import settings
 
 # this is the Alembic Config object, which provides
