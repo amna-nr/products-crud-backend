@@ -49,7 +49,7 @@ async def product_update (db: db_dependency, product_id: int, product_details: P
     await db.commit()
     await db.refresh(product)
 
-    return {"message" : "product has been updated"}
+    return product
 
 
 
