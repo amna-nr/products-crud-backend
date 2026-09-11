@@ -1,6 +1,6 @@
 from app.services.products import products_get, product_get_by_id, product_create, product_update, product_delete
 from app.core.database import db_dependency
-from app.schemas.products import ProductCreate, ProductUpdate
+from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse
 from fastapi import APIRouter
 
 
@@ -18,7 +18,7 @@ async def get_product_by_id(db: db_dependency, id: int):
     return await product_get_by_id(db, id)
 
 @router.post("/")
-async def create_product(db: db_dependency, product_details: ProductCreate):
+async def create_product(db: db_dependency, product_details: ProductCreate) -> ProductResponse:
     return await product_create(db, product_details)
 
 @router.put("/{id}")

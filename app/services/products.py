@@ -29,8 +29,7 @@ async def product_create (db: db_dependency, product: ProductCreate):
     db.add(new_product)
     await db.commit()
     await db.refresh(new_product)
-
-    return {"message" : "Product has been created"}
+    return new_product
 
 async def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate):
     result = await db.execute(select(Product).where(Product.id == product_id))
@@ -50,8 +49,6 @@ async def product_update (db: db_dependency, product_id: int, product_details: P
     await db.refresh(product)
 
     return product
-
-
 
 async def product_delete (db: db_dependency, product_id: int):
     result = await db.execute(select(Product).where(Product.id == product_id))
