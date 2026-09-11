@@ -22,8 +22,8 @@ async def create_product(db: db_dependency, product_details: ProductCreate):
     return await product_create(db, product_details)
 
 @router.put("/{id}")
-async def update_product(db: db_dependency, product_id: int, product_details: ProductUpdate):
-    return await product_update(db, product_id, product_details)
+async def update_product(db: db_dependency, id: int, product_details: ProductUpdate):
+    return await product_update(db, id, product_details)
 
 @router.delete("/{id}")
 async def delete_product(db: db_dependency, id: int):
