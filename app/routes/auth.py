@@ -11,13 +11,13 @@ router = APIRouter(
 
 
 @router.post("/register")
-async def register_user(credentials: UserRegister, db: db_dependency):
-    return await register(credentials, db)
+def register_user(credentials: UserRegister, db: db_dependency):
+    return register(credentials, db)
 
 @router.post("/login")
-async def login_user(credentials: UserLogin, db: db_dependency, response: Response):
-    return await login(credentials, db, response)
+def login_user(credentials: UserLogin, db: db_dependency, response: Response):
+    return login(credentials, db, response)
 
 @router.post("/logout")
-async def logout_user(response: Response, session_id: str = Cookie(...)):
-    return await logout(response, session_id)
+def logout_user(response: Response, session_id: str = Cookie(...)):
+    return logout(response, session_id)

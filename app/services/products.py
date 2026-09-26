@@ -6,14 +6,14 @@ from fastapi import HTTPException
 from starlette import status
 
 
-async def products_get(db: db_dependency):
-    result = await db.execute(select(Product))
+def products_get(db: db_dependency):
+    result = db.execute(select(Product))
     products = result.scalars().all()
 
     return products 
 
-async def product_get_by_id(db: db_dependency, product_id: int):
-    result = await db.execute(select(Product).where(Product.id == product_id))
+def product_get_by_id(db: db_dependency, product_id: int):
+    result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
 
     if product is None:
@@ -24,15 +24,15 @@ async def product_get_by_id(db: db_dependency, product_id: int):
 
     return product
 
-async def product_create (db: db_dependency, product: ProductCreate):
+def product_create (db: db_dependency, product: ProductCreate):
     new_product = Product(name=product.name, price=product.price, quantity=product.quantity)
     db.add(new_product)
-    await db.commit()
-    await db.refresh(new_product)
+    db.commit()
+    db.refresh(new_product)
     return new_product
 
-async def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate):
-    result = await db.execute(select(Product).where(Product.id == product_id))
+def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate):
+    result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
 
     if product is None:
@@ -45,13 +45,13 @@ async def product_update (db: db_dependency, product_id: int, product_details: P
     product.price = product_details.price
     product.quantity = product_details.quantity
 
-    await db.commit()
-    await db.refresh(product)
+    db.commit()
+    db.refresh(product)
 
     return product
 
-async def product_delete (db: db_dependency, product_id: int):
-    result = await db.execute(select(Product).where(Product.id == product_id))
+def product_delete (db: db_dependency, product_id: int):
+    result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
     
     if product is None:
@@ -60,7 +60,7 @@ async def product_delete (db: db_dependency, product_id: int):
             detail="Product not found"
         )
     
-    await db.execute(delete(Product).where(Product.id == product_id))
-    await db.commit()
+    db.execute(delete(Product).where(Product.id == product_id))
+    db.commit()
 
     return {"message" : "Product has been deleted"}

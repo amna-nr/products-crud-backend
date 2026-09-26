@@ -9,14 +9,14 @@ from fastapi import HTTPException, Response, Cookie
 from starlette import status
 
 
-async def register(credentials: UserRegister, db: db_dependency):
+def register(credentials: UserRegister, db: db_dependency):
     if credentials.password != credentials.confirm_password:
             raise HTTPException(
                 status_code= status.HTTP_401_UNAUTHORIZED,
                 detail = "Invalid credentials"
             )
     
-    result = await db.execute(select(User).where(User.email == credentials.email))
+    result = db.execute(select(User).where(User.email == credentials.email))
     existing_user = result.scalar_one_or_none()
 
     if existing_user:
@@ -29,14 +29,14 @@ async def register(credentials: UserRegister, db: db_dependency):
 
     new_user = User(email=credentials.email, password_hash=password_hash)
     db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
+    db.commit()
+    db.refresh(new_user)
 
     return {"message" : "user has been created"}
 
 
-async def login(credentials: UserLogin, db: db_dependency, response: Response):
-    result = await db.execute(select(User).where(User.email == credentials.email))
+def login(credentials: UserLogin, db: db_dependency, response: Response):
+    result = db.execute(select(User).where(User.email == credentials.email))
     user = result.scalar_one_or_none()
 
     if user is None:
@@ -51,13 +51,13 @@ async def login(credentials: UserLogin, db: db_dependency, response: Response):
                detail="Invalid credentials"
           )
 
-    await create_session(str(user.id), user.email, response)
+    create_session(str(user.id), user.email, response)
 
     return {"message": "logged in"}
     
 
-async def logout(response: Response, session_id: str = Cookie(...)):
-    session = await redis_client.get(f"session:{session_id}")
+def logout(response: Response, session_id: str = Cookie(...)):
+    session = redis_client.get(f"session:{session_id}")
 
     if not session:
         raise HTTPException(
@@ -65,7 +65,7 @@ async def logout(response: Response, session_id: str = Cookie(...)):
              detail="Session not found"
         )
 
-    await redis_client.delete(f"session:{session_id}")
+    redis_client.delete(f"session:{session_id}")
 
     response.delete_cookie("session_id")
 
