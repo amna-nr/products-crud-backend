@@ -10,21 +10,21 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def get_products(db: db_dependency):
-    return await products_get(db)
+def get_products(db: db_dependency):
+    return products_get(db)
 
 @router.get("/{id}")
-async def get_product_by_id(db: db_dependency, id: int):
-    return await product_get_by_id(db, id)
+def get_product_by_id(db: db_dependency, id: int):
+    return product_get_by_id(db, id)
 
 @router.post("/")
-async def create_product(db: db_dependency, product_details: ProductCreate) -> ProductResponse:
-    return await product_create(db, product_details)
+def create_product(db: db_dependency, product_details: ProductCreate) -> ProductResponse:
+    return product_create(db, product_details)
 
 @router.put("/{id}")
-async def update_product(db: db_dependency, id: int, product_details: ProductUpdate):
-    return await product_update(db, id, product_details)
+def update_product(db: db_dependency, id: int, product_details: ProductUpdate):
+    return product_update(db, id, product_details)
 
 @router.delete("/{id}")
-async def delete_product(db: db_dependency, id: int):
-    return await product_delete(db, id)
+def delete_product(db: db_dependency, id: int):
+    return product_delete(db, id)

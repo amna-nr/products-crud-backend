@@ -1,25 +1,20 @@
 from app.core.config import settings 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from typing import Annotated
 from fastapi import Depends
 
 
-
 DATABASE_URL = settings.DATABASE_URL
 
-engine = create_async_engine(DATABASE_URL,  echo=True)
+engine = create_engine(DATABASE_URL, echo=settings.ENVIRONMENT == "development")
 
 Base = declarative_base()
 
-AsyncSessionLocal = async_sessionmaker(bind=engine, expire_on_commit=False)
+SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
-async def get_db():
-    async with AsyncSessionLocal() as db:
-        try:
-            yield db
-        except Exception:
-            await db.rollback()
-            raise 
+def get_db():
+    with SessionLocal as db:
+        yield db
 
-db_dependency = Annotated[AsyncSession, Depends(get_db)]
+db_dependency = Annotated[Session, Depends(get_db)]

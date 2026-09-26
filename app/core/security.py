@@ -13,7 +13,7 @@ def check_password(plain: str, hashed: str) -> bool:
     return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
-async def create_session(user_id: str, user_email: str, response: Response):
+def create_session(user_id: str, user_email: str, response: Response):
     session_id = secrets.token_urlsafe()
 
     user = {
@@ -22,7 +22,7 @@ async def create_session(user_id: str, user_email: str, response: Response):
     }
 
 
-    await redis_client.set(
+    redis_client.set(
             f"session:{session_id}",
             json.dumps(user),
             ex=3600,
