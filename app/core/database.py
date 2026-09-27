@@ -16,7 +16,7 @@ Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
 def get_db():
-    with SessionLocal as db:
+    with SessionLocal() as db:
         yield db
 
 db_dependency = Annotated[Session, Depends(get_db)]
