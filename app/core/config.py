@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     REDIS_URL: str
     ENVIRONMENT: str
     UNSPLASH_ACCESS_KEY: str
+    UNSPLASH_API_URL: str
 
     class Config():
         env_file = ".env"
