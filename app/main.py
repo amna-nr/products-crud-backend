@@ -1,7 +1,7 @@
-from fastapi import FastAPI
 from app.routes.auth import router as auth_router
-from app.routes.products import router as products_router
 from app.routes.images import router as images_router
+from app.routes.products import router as products_router
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 

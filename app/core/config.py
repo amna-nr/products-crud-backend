@@ -1,8 +1,8 @@
-from pydantic_settings import BaseSettings 
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str 
+    DATABASE_URL: str
     REDIS_URL: str
     ENVIRONMENT: str
     UNSPLASH_ACCESS_KEY: str

@@ -1,9 +1,10 @@
-from app.core.config import settings 
+from typing import Annotated
+
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
-from typing import Annotated
-from fastapi import Depends
 
+from app.core.config import settings
 
 
 DATABASE_URL = settings.DATABASE_URL
@@ -20,6 +21,6 @@ async def get_db():
             yield db
         except Exception:
             await db.rollback()
-            raise 
+            raise
 
 db_dependency = Annotated[AsyncSession, Depends(get_db)]

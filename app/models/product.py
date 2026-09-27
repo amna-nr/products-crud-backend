@@ -1,5 +1,5 @@
-from app.core.database import Base 
-from sqlalchemy import Column, String, Integer 
+from sqlalchemy import Column, String, Integer
+from app.core.database import Base
 
 
 class Product(Base):
