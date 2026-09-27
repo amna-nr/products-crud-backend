@@ -7,8 +7,8 @@ class ProductCreate(BaseModel):
     quantity: int
 
 class ProductUpdate(BaseModel):
-    name: str 
-    price: int 
+    name: str
+    price: int
     quantity: int
 
 class ProductResponse(BaseModel):
@@ -16,4 +16,4 @@ class ProductResponse(BaseModel):
     name: str
     price: int
     quantity: int
-    
+ 

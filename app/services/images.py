@@ -1,9 +1,9 @@
+import requests
 from app.core.config import settings
-import requests 
 
 
 def get_image (product: str):
-    response = requests.get("https://api.unsplash.com/search/photos", 
+    response = requests.get("https://api.unsplash.com/search/photos",
                 headers={
                     "Authorization": f"Client-ID {settings.UNSPLASH_ACCESS_KEY}"
                 },
