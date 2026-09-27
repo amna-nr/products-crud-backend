@@ -1,12 +1,14 @@
-import bcrypt 
-import secrets
 import json
-from app.core.redis import redis_client
-from app.core.config import settings 
+import secrets
+
+import bcrypt
 from fastapi import Response
 
+from app.core.config import settings
+from app.core.redis import redis_client
 
-def hash_password(password: str): 
+
+def hash_password(password: str):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 def check_password(plain: str, hashed: str) -> bool:
@@ -17,22 +19,22 @@ def create_session(user_id: str, user_email: str, response: Response):
     session_id = secrets.token_urlsafe()
 
     user = {
-            "id" : user_id,
-            "email": user_email
+        "id" : user_id,
+        "email": user_email
     }
 
 
     redis_client.set(
-            f"session:{session_id}",
-            json.dumps(user),
-            ex=3600,
-        )
+        f"session:{session_id}",
+        json.dumps(user),
+        ex=3600,
+    )
 
     response.set_cookie(
-            key="session_id",
-            value=session_id,
-            httponly=True,
-            secure=settings.ENVIRONMENT == "production",
-            samesite="lax",
-            max_age=3600,
-        )
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="lax",
+        max_age=3600,
+    )

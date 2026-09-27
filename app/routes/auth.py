@@ -1,7 +1,8 @@
-from app.services.auth import register, login, logout
-from app.schemas.auth import UserRegister, UserLogin
-from app.core.database import db_dependency
 from fastapi import APIRouter, Response, Cookie
+
+from app.core.database import db_dependency
+from app.schemas.auth import UserRegister, UserLogin
+from app.services.auth import register, login, logout
 
 
 router = APIRouter(

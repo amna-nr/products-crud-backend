@@ -1,7 +1,8 @@
-from app.services.products import products_get, product_get_by_id, product_create, product_update, product_delete
+from fastapi import APIRouter
+
 from app.core.database import db_dependency
 from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse
-from fastapi import APIRouter
+from app.services.products import products_get, product_get_by_id, product_create, product_update, product_delete
 
 
 router = APIRouter(

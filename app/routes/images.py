@@ -1,5 +1,5 @@
-from app.services.images import get_image
 from fastapi import APIRouter
+from app.services.images import get_image
 
 
 router = APIRouter(

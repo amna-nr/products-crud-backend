@@ -1,7 +1,10 @@
-from sqlalchemy import Column, String, Integer, Boolean
-from app.core.database import Base
 from uuid import uuid4
+
+from sqlalchemy import Column, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
+
+from app.core.database import Base
+
 
 
 class User(Base):
