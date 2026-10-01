@@ -16,4 +16,7 @@ class ProductResponse(BaseModel):
     name: str
     price: int
     quantity: int
- 
+
+class ProductAddToCart(BaseModel):
+    id: int
+    quantity: int
