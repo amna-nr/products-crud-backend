@@ -1,5 +1,6 @@
 import json
 
+from datetime import datetime, timezone
 from fastapi import Cookie, HTTPException
 from sqlalchemy import select
 from starlette import status
@@ -22,7 +23,7 @@ def get_cart_products(db: db_dependency, session_id : str = Cookie(...)):
     user = json.loads(user)
     user_id = UUID(user["id"])
  
-    result = db.execute(select(Cart).where(Cart.user_id == user_id))
+    result = db.execute(select(Cart).where(Cart.user_id == user_id).order_by(Cart.added_at.desc()))
     cart = result.scalars().all()
 
     products = []
@@ -48,6 +49,7 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
     existing_product = result.scalar_one_or_none()
     if existing_product: 
         existing_product.quantity += product.quantity
+        existing_product.added_at = datetime.now(timezone.utc)
         db.commit()
     else:    
         new_product = Cart(user_id = user_id, product_id = product.id, quantity = product.quantity)
