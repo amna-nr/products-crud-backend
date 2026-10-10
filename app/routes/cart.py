@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Cookie
 from app.core.database import db_dependency
-from app.services.cart import get_cart_products, add_product_to_cart
+from app.services.cart import get_cart_products, add_product_to_cart, delete_product_from_cart
 from app.schemas.products import ProductAddToCart
 
 
@@ -17,3 +17,8 @@ def get_cart(db: db_dependency, session_id : str = Cookie(...)):
 @router.post("/")
 def add_to_cart(product: ProductAddToCart, db: db_dependency, session_id : str = Cookie(...)):
     return add_product_to_cart(product, db, session_id)
+
+@router.delete("/{product_id}")
+def delete_from_cart(product_id: int,  db: db_dependency, session_id : str = Cookie(...)):
+    return delete_product_from_cart(product_id, db, session_id)
+    

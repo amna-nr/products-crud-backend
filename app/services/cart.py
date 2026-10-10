@@ -2,7 +2,7 @@ import json
 
 from datetime import datetime, timezone
 from fastapi import Cookie, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from starlette import status
 from uuid import UUID
 
@@ -57,4 +57,18 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
         db.commit()
 
     return {"message" : "Product has been added to cart"}
+
+def delete_product_from_cart(product_id: int, db: db_dependency, session_id : str = Cookie(...)):
+    user = redis_client.get(f"session:{session_id}")
+    if not user:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            detail="You must be logged in to delete this product"
+        )
+    user = json.loads(user)
+    user_id = UUID(user["id"])
     
+    result = db.execute(delete(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id))
+    db.commit()
+
+    return {"message" : "Product removed from cart"}
