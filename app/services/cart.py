@@ -56,7 +56,7 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
     result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product.id))
     cart_product = result.scalar_one_or_none()
 
-    if existing_product.quantity - product.quantity < 0:
+    if existing_product.stock_quantity - product.quantity < 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Stock limit exceeded"
@@ -67,7 +67,7 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
             detail="Add one or more products"
         )
     if  cart_product: 
-        if cart_product.quantity >= existing_product.quantity:
+        if cart_product.quantity + product.quantity >= existing_product.stock_quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, 
                 detail="Stock limit exceeded"
@@ -124,7 +124,7 @@ def update_cart_product(product: CartProductUpdate, db: db_dependency, session_i
     existing_product = result.scalar_one_or_none()
 
     if product.quantity > cart_product.quantity:
-        if existing_product.quantity - product.quantity >= 0: 
+        if existing_product.stock_quantity - product.quantity >= 0: 
             cart_product.quantity = product.quantity
     if product.quantity < cart_product.quantity and cart_product.quantity > 1: 
         cart_product.quantity = product.quantity

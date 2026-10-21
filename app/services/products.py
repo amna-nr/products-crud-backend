@@ -26,7 +26,7 @@ def product_get_by_id(db: db_dependency, product_id: int):
     return product
 
 def product_create (db: db_dependency, product: ProductCreate):
-    new_product = Product(name=product.name, price=product.price, quantity=product.quantity)
+    new_product = Product(name=product.name, price=product.price, stock_quantity=product.stock_quantity)
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
@@ -44,7 +44,7 @@ def product_update (db: db_dependency, product_id: int, product_details: Product
     
     product.name = product_details.name
     product.price = product_details.price
-    product.quantity = product_details.quantity
+    product.stock_quantity = product_details.stock_quantity
 
     db.commit()
     db.refresh(product)
