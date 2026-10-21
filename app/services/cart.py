@@ -10,6 +10,7 @@ from app.core.database import db_dependency
 from app.core.redis import redis_client
 from app.models.cart import Cart
 from app.models.product import Product
+from app.schemas.cart import CartProductUpdate
 from app.schemas.products import ProductAddToCart
 
 
@@ -45,17 +46,39 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
     user = json.loads(user)
     user_id = UUID(user["id"])
 
-    result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product.id))
+    result = db.execute(select(Product).where(Product.id == product.id))
     existing_product = result.scalar_one_or_none()
-    if existing_product: 
-        existing_product.quantity += product.quantity
-        existing_product.added_at = datetime.now(timezone.utc)
+
+    if not existing_product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Product does not exist")
+
+    result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product.id))
+    cart_product = result.scalar_one_or_none()
+
+    if existing_product.quantity - product.quantity < 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Stock limit exceeded"
+        )
+    if product.quantity <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Add one or more products"
+        )
+    if  cart_product: 
+        if cart_product.quantity >= existing_product.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Stock limit exceeded"
+            )
+        cart_product.quantity += product.quantity
+        cart_product.added_at = datetime.now(timezone.utc)
         db.commit()
     else:    
         new_product = Cart(user_id = user_id, product_id = product.id, quantity = product.quantity)
         db.add(new_product)
         db.commit()
-
     return {"message" : "Product has been added to cart"}
 
 def delete_product_from_cart(product_id: int, db: db_dependency, session_id : str = Cookie(...)):
@@ -67,8 +90,46 @@ def delete_product_from_cart(product_id: int, db: db_dependency, session_id : st
         )
     user = json.loads(user)
     user_id = UUID(user["id"])
-    
-    result = db.execute(delete(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id))
-    db.commit()
 
+    result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id))
+    cart_product = result.scalar_one_or_none() 
+
+    if not cart_product:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+    result = db.execute(delete(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id))
+    db.commit() 
     return {"message" : "Product removed from cart"}
+
+def update_cart_product(product: CartProductUpdate, db: db_dependency, session_id : str = Cookie(...)):
+    user = redis_client.get(f"session:{session_id}")
+    if not user:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            detail="You must be logged in to delete this product"
+        )
+    user = json.loads(user)
+    user_id = UUID(user["id"])
+        
+    result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product.id))
+    cart_product = result.scalar_one_or_none()
+
+    if not cart_product: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Product not found")
+
+    result = db.execute(select(Product).where(Product.id == product.id))
+    existing_product = result.scalar_one_or_none()
+
+    if product.quantity > cart_product.quantity:
+        if existing_product.quantity - product.quantity >= 0: 
+            cart_product.quantity = product.quantity
+    if product.quantity < cart_product.quantity and cart_product.quantity > 1: 
+        cart_product.quantity = product.quantity
+
+    db.commit()
+    db.refresh(cart_product)
+    
+    return {"message" : "Product edited in cart"}
