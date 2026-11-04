@@ -9,12 +9,6 @@ def create_checkout_session(db: db_dependency, session_id : str = Cookie(...)):
     selected_products = get_selected_cart_products(db, session_id)
     products = get_products(selected_products, db)
 
-    if not products: 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
-
     line_items = []
 
     for product_info in products:
