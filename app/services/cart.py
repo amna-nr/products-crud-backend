@@ -15,7 +15,7 @@ from app.schemas.products import ProductAddToCart
 
 
 def get_user(session_id : str):
-    user = redis_client.get(f"session:{session_id}")
+    user = redis_client.getex(f"session:{session_id}", ex=3600)
     if not user:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
