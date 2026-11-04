@@ -19,7 +19,7 @@ def get_user(session_id : str):
     if not user:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
-            detail="You must be logged in to access the cart"
+            detail="You must be logged in"
         )
     user = json.loads(user)
     user_id = UUID(user["id"])
