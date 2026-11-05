@@ -25,7 +25,7 @@ def get_user(session_id : str):
     user_id = UUID(user["id"])
     return user_id
 
-def get_selected_cart_products (db: db_dependency, session_id: str = Cookie(...)):
+def get_selected_cart_products (db: db_dependency, session_id: str | None = Cookie(None)):
     user_id = get_user(session_id)
     result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.is_selected == True))
     selected_products = result.scalars().all()
@@ -53,20 +53,6 @@ def get_products(cart: list, db: db_dependency):
                         "is_selected": cart_item.is_selected})
     return products
 
-def get_cart_products(db: db_dependency, session_id : str = Cookie(...)):
-    user_id = get_user(session_id)
-
-    result = db.execute(select(Cart).where(Cart.user_id == user_id).order_by(Cart.added_at.desc()))
-    cart = result.scalars().all()
-
-    if not cart:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Your cart is empty"
-        )
-    
-    return get_products(cart, db)
-
 def get_cart_product(user_id: UUID, product_id: int, db: db_dependency):
     result = db.execute(select(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id))
     cart_product = result.scalar_one_or_none() 
@@ -78,7 +64,20 @@ def get_cart_product(user_id: UUID, product_id: int, db: db_dependency):
         )
     return cart_product
 
-def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id : str = Cookie(...)):
+
+
+
+def get_cart_products(db: db_dependency, session_id : str | None = Cookie(None)):
+    user_id = get_user(session_id)
+
+    result = db.execute(select(Cart).where(Cart.user_id == user_id).order_by(Cart.added_at.desc()))
+    cart = result.scalars().all()
+
+    if not cart:
+        return []
+    return get_products(cart, db)
+
+def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id : str | None = Cookie(None)):
     user_id = get_user(session_id)
 
     result = db.execute(select(Product).where(Product.id == product.id))
@@ -118,7 +117,7 @@ def add_product_to_cart(product: ProductAddToCart, db: db_dependency, session_id
         db.commit()
     return {"message" : "Product has been added to cart"}
 
-def delete_product_from_cart(product_id: int, db: db_dependency, session_id : str = Cookie(...)):
+def delete_product_from_cart(product_id: int, db: db_dependency, session_id : str | None = Cookie(None)):
     user_id = get_user(session_id)
 
     get_cart_product(user_id, product_id, db)
@@ -127,7 +126,7 @@ def delete_product_from_cart(product_id: int, db: db_dependency, session_id : st
     db.commit() 
     return {"message" : "Product removed from cart"}
 
-def update_cart_product(product: CartProductUpdate, db: db_dependency, session_id : str = Cookie(...)):
+def update_cart_product(product: CartProductUpdate, db: db_dependency, session_id : str | None = Cookie(None)):
     user_id = get_user(session_id)       
     cart_product = get_cart_product(user_id, product.id, db)
 
@@ -157,7 +156,7 @@ def update_cart_product(product: CartProductUpdate, db: db_dependency, session_i
     
     return {"message" : "Product edited in cart"}
 
-def select_cart_product(product_id: int, db: db_dependency, session_id : str = Cookie(...)):
+def select_cart_product(product_id: int, db: db_dependency, session_id : str | None = Cookie(None)):
     user_id = get_user(session_id)
         
     cart_product = get_cart_product(user_id, product_id, db)

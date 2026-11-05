@@ -26,7 +26,7 @@ def product_get_by_id(db: db_dependency, product_id: int):
 
     return product
 
-def product_create (db: db_dependency, product: ProductCreate, session_id: str = Cookie(...)):
+def product_create (db: db_dependency, product: ProductCreate, session_id: str | None = Cookie(None)):
     user_id = get_user(session_id)
 
     new_product = Product(name=product.name, price=product.price, stock_quantity=product.stock_quantity)
@@ -35,7 +35,7 @@ def product_create (db: db_dependency, product: ProductCreate, session_id: str =
     db.refresh(new_product)
     return new_product
 
-def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate, session_id: str = Cookie(...)):
+def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate, session_id: str | None = Cookie(None)):
     user_id = get_user(session_id)
      
     result = db.execute(select(Product).where(Product.id == product_id))
@@ -56,9 +56,9 @@ def product_update (db: db_dependency, product_id: int, product_details: Product
 
     return product
 
-def product_delete (db: db_dependency, product_id: int, session_id: str = Cookie(...)):
+def product_delete (db: db_dependency, product_id: int, session_id: str | None = Cookie(None)):
     user_id = get_user(session_id)
-    
+
     result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
     

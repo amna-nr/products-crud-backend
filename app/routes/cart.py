@@ -13,25 +13,25 @@ router = APIRouter(
 )
 
 @router.get("/")
-def get_cart(db: db_dependency, session_id : str = Cookie(...)):
+def get_cart(db: db_dependency, session_id : str | None = Cookie(None)):
     return get_cart_products(db, session_id)
 
 @router.get("/selected")
-def get_selected_products(db: db_dependency, session_id : str = Cookie(...)):
+def get_selected_products(db: db_dependency, session_id : str | None = Cookie(None)):
     return get_selected_cart_products(db, session_id)
 
 @router.post("/")
-def add_to_cart(product: ProductAddToCart, db: db_dependency, session_id : str = Cookie(...)):
+def add_to_cart(product: ProductAddToCart, db: db_dependency, session_id : str | None = Cookie(None)):
     return add_product_to_cart(product, db, session_id)
 
 @router.put("/{product_id}")
-def select_from_cart(product_id: int, db: db_dependency, session_id : str = Cookie(...)):
+def select_from_cart(product_id: int, db: db_dependency, session_id : str | None = Cookie(None)):
     return select_cart_product(product_id, db, session_id)
 
 @router.delete("/{product_id}")
-def delete_from_cart(product_id: int,  db: db_dependency, session_id : str = Cookie(...)):
+def delete_from_cart(product_id: int,  db: db_dependency, session_id : str | None = Cookie(None)):
     return delete_product_from_cart(product_id, db, session_id)
 
 @router.put("/")
-def update_cart(product: CartProductUpdate, db: db_dependency, session_id : str = Cookie(...)):
+def update_cart(product: CartProductUpdate, db: db_dependency, session_id : str | None = Cookie(None)):
     return update_cart_product(product, db, session_id)

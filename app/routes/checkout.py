@@ -9,5 +9,5 @@ router = APIRouter(
 )
 
 @router.post("/create-payment-session")
-def payment_session(db: db_dependency, session_id: str = Cookie(...)):
+def payment_session(db: db_dependency, session_id: str | None = Cookie(None)):
     return create_checkout_session(db, session_id)
