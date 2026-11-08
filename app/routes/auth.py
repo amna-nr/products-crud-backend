@@ -20,5 +20,5 @@ def login_user(credentials: UserLogin, db: db_dependency, response: Response):
     return login(credentials, db, response)
 
 @router.post("/logout")
-def logout_user(response: Response, session_id: str = Cookie(...)):
+def logout_user(response: Response, session_id: str | None = Cookie(None)):
     return logout(response, session_id)

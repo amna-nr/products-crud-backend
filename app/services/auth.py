@@ -54,7 +54,7 @@ def login(credentials: UserLogin, db: db_dependency, response: Response):
 
     return {"message": "logged in"}
     
-def logout(response: Response, session_id: str = Cookie(...)):
+def logout(response: Response, session_id: str | None = Cookie(None)):
     session = redis_client.get(f"session:{session_id}")
 
     if not session:

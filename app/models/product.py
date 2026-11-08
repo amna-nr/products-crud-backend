@@ -8,4 +8,4 @@ class Product(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
-    quantity = Column(Integer, nullable=False)
+    stock_quantity = Column(Integer, nullable=False)

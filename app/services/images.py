@@ -10,5 +10,5 @@ def get_image (product: str):
                 params={
                     "query": product
                 })
-    url = response.json()["results"][0]["urls"]["thumb"]
+    url = response.json()["results"][0]["urls"]["full"]
     return url

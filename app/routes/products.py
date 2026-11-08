@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Cookie
 
 from app.core.database import db_dependency
 from app.schemas.products import ProductCreate, ProductUpdate, ProductResponse
@@ -19,13 +19,13 @@ def get_product_by_id(db: db_dependency, id: int):
     return product_get_by_id(db, id)
 
 @router.post("/")
-def create_product(db: db_dependency, product_details: ProductCreate) -> ProductResponse:
-    return product_create(db, product_details)
+def create_product(db: db_dependency, product_details: ProductCreate, session_id: str | None = Cookie(None)) -> ProductResponse:
+    return product_create(db, product_details, session_id)
 
 @router.put("/{id}")
-def update_product(db: db_dependency, id: int, product_details: ProductUpdate):
-    return product_update(db, id, product_details)
+def update_product(db: db_dependency, id: int, product_details: ProductUpdate, session_id: str | None = Cookie(None)):
+    return product_update(db, id, product_details, session_id)
 
 @router.delete("/{id}")
-def delete_product(db: db_dependency, id: int):
-    return product_delete(db, id)
+def delete_product(db: db_dependency, id: int, session_id: str | None  = Cookie(None)):
+    return product_delete(db, id, session_id)

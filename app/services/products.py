@@ -1,10 +1,11 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Cookie
 from sqlalchemy import select, delete
 from starlette import status
 
 from app.core.database import db_dependency
 from app.models.product import Product
 from app.schemas.products import ProductCreate, ProductUpdate
+from app.services.cart import get_user
 
 
 def products_get(db: db_dependency):
@@ -25,14 +26,18 @@ def product_get_by_id(db: db_dependency, product_id: int):
 
     return product
 
-def product_create (db: db_dependency, product: ProductCreate):
-    new_product = Product(name=product.name, price=product.price, quantity=product.quantity)
+def product_create (db: db_dependency, product: ProductCreate, session_id: str | None = Cookie(None)):
+    user_id = get_user(session_id)
+
+    new_product = Product(name=product.name, price=product.price, stock_quantity=product.stock_quantity)
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
     return new_product
 
-def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate):
+def product_update (db: db_dependency, product_id: int, product_details: ProductUpdate, session_id: str | None = Cookie(None)):
+    user_id = get_user(session_id)
+     
     result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
 
@@ -44,14 +49,16 @@ def product_update (db: db_dependency, product_id: int, product_details: Product
     
     product.name = product_details.name
     product.price = product_details.price
-    product.quantity = product_details.quantity
+    product.stock_quantity = product_details.stock_quantity
 
     db.commit()
     db.refresh(product)
 
     return product
 
-def product_delete (db: db_dependency, product_id: int):
+def product_delete (db: db_dependency, product_id: int, session_id: str | None = Cookie(None)):
+    user_id = get_user(session_id)
+
     result = db.execute(select(Product).where(Product.id == product_id))
     product = result.scalar_one_or_none()
     

@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str
     UNSPLASH_ACCESS_KEY: str
     UNSPLASH_API_URL: str
+    STRIPE_SECRET_KEY: str
 
     class Config():
         env_file = ".env"
